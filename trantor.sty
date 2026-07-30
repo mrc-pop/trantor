@@ -1,0 +1,179 @@
+% trantor.sty -- a Metropolis-style theme for the ltx-talk class.
+% Compile with lualatex. Needs the Libertinus fonts and the euler-math package.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{trantor}[2026-04-28 v1.0 Metropolis-like theme for ltx-talk]
+
+% -- Fonts: Libertinus Serif for the body, Libertinus Sans for titles.
+\RequirePackage{fontspec}
+\setsansfont{Libertinus Serif}[Scale=1.05]
+\renewcommand{\familydefault}{\sfdefault}
+\linespread{1.18}
+\newfontfamily\headerfont{Libertinus Sans}
+
+\RequirePackage{tikz}
+\RequirePackage{lastpage}
+\RequirePackage{refcount}
+\RequirePackage{pifont}
+\makeatletter
+
+% Tighten the space around display maths -- the default 11pt reads as a big gap
+% on a slide, especially inside a list. Re-applied on every \normalsize so the
+% size files don't reset it.
+\g@addto@macro\normalsize{%
+  \setlength\abovedisplayskip{5pt plus 2pt minus 1pt}%
+  \setlength\belowdisplayskip{5pt plus 2pt minus 1pt}%
+  \setlength\abovedisplayshortskip{5pt plus 2pt minus 1pt}%
+  \setlength\belowdisplayshortskip{5pt plus 2pt minus 1pt}%
+}
+
+% -- Colours. Set your own accent anywhere in the preamble with, e.g.,
+%      \definecolor{accent}{HTML}{BF1238}
+\providecolor{accent}{HTML}{2A7AE2}
+\colorlet{TrantorDark}{black}
+\AddToHook{begindocument}{\colorlet{TrantorAccent}{accent}}
+
+% itemize/enumerate labels in black rather than the class default
+\AddToHook{begindocument}{\colorlet{structure}{black}}
+
+% -- Header bar carrying the frame title (hidden on plain pages).
+\AddToHook{begindocument}{%
+  \EditInstance{header}{std}{
+    background-color  = white,
+    color             = black,
+    print-frame-title = true,
+    height            = 30pt,
+    font              = \headerfont\bfseries,
+    left-hspace       = \dimexpr\Gm@lmargin - 0.6cm\relax,
+  }%
+  \EditInstance{footer}{std}{element-order = {}}%
+  \EditInstance{frametitle}{header}{after-vspace = 6mm minus 3mm}%
+}
+
+% Like \frametitle, but forces a gap below the title on packed slides where the
+% header's own spacing collapses. The \par gets us into vertical mode first.
+\newcommand{\stitle}[1]{\frametitle{#1}\par\addvspace{4mm}}
+
+% Tick and cross, for marking things right or wrong.
+\newcommand{\yes}{\ding{51}}
+\newcommand{\no}{\ding{55}}
+
+% -- Bottom progress bar + frame counter (hidden on plain pages).
+\newif\iftrantorPlainPage
+\trantorPlainPagefalse
+
+\AddToHook{shipout/foreground}{%
+  \iftrantorPlainPage\else
+  \begin{tikzpicture}[remember picture, overlay]
+    \pgfmathsetmacro{\trantorratio}{(\@totalframes > 0) ? (\theframe / \@totalframes) : 0}%
+    \fill[TrantorAccent]
+      (current page.south west)
+      rectangle
+      ([xshift=\trantorratio\paperwidth, yshift=1pt] current page.south west);
+    \node[anchor=south east, inner sep=5pt, font=\tiny, text=TrantorDark]
+      at (current page.south east) {\theframe\,/\,\@totalframes};
+  \end{tikzpicture}%
+  \fi
+  \global\trantorPlainPagefalse
+}
+
+% -- Remember the current section title, and dim the others in the mini-TOC.
+\ExplSyntaxOn
+\tl_new:N \g__trantor_section_tl
+
+\AddToHook{section/begin}{
+  \cs_if_exist:NT \l__talk_section_tl {
+    \tl_gset:NV \g__trantor_section_tl \l__talk_section_tl
+  }
+}
+
+\cs_new_protected:Npn \__trantor_print_section: { \tl_use:N \g__trantor_section_tl }
+\cs_set_eq:NN \trantorSectionTitle \__trantor_print_section:
+
+% Soften the class's dimming of inactive TOC entries (0.2 -> 0.7).
+\cs_set_protected:Npn \__talk_toc_dest:w #1 . #2 . #3 . #4 . #5 \q_stop #6
+  {
+    \bool_lazy_or:nnTF
+      {
+        \bool_lazy_and_p:nn
+          { \int_compare_p:nNn { \value { section } } = {#2} }
+          { \int_compare_p:nNn { \value { subsection } } = 0 }
+       }
+       {
+         \bool_lazy_and_p:nn
+           { \int_compare_p:nNn { \value { section } } = {#2} }
+           { \int_compare_p:nNn { \value { subsection } } = {#3} }
+      }
+      {#6}
+      { \opacity_begin:n { 0.7 } #6 \opacity_end: }
+  }
+\ExplSyntaxOff
+
+% -- Title page. Drop a logo.png next to your slides, or redefine \titlelogo.
+\newcommand{\titlelogo}{%
+  \IfFileExists{logo.png}
+    {\includegraphics[height=1.4cm, alt={Organisation logo}]{logo.png}}{}%
+}
+
+\renewcommand{\maketitle}{%
+  \global\trantorPlainPagetrue
+  \begin{frame}{}%
+    \thispagestyle{plain}%
+    \vfill
+    \hspace*{0.04\paperwidth}%
+    \begin{minipage}{0.82\paperwidth}
+      \raggedright
+      {\color{TrantorDark}\headerfont\Large\bfseries \@title\par}%
+      \vspace{0.5em}%
+      {\color{TrantorAccent}\rule{\linewidth}{0.8pt}\par}%
+      \vspace{1.3em}%
+      % Metadata on the left, logo on the right; bottom-aligned so the logo sits
+      % level with the date and grows upward rather than below it.
+      \begin{minipage}[b]{0.66\linewidth}
+        \raggedright
+        {\normalsize \@author\par}%
+        \ifx\@institute\empty\else
+          \vspace{0.2em}%
+          {\small\color{TrantorDark!60!white} \@institute\par}%
+        \fi
+        \vspace{0.2em}%
+        {\small \@date\par}%
+      \end{minipage}%
+      \hfill
+      \begin{minipage}[b]{0.30\linewidth}
+        \raggedleft
+        \titlelogo
+      \end{minipage}%
+    \end{minipage}%
+    \hspace*{0.04\paperwidth}%
+    \vspace{0.12\paperheight}%
+  \end{frame}%
+}
+
+% -- Section divider page (dark full-bleed panel with the mini-TOC).
+\NewDocumentCommand \sectionpage { } {%
+  \global\trantorPlainPagetrue
+  \begin{frame}{}%
+    \thispagestyle{plain}%
+    \noindent
+    \begin{tikzpicture}
+      \useasboundingbox (0,0) rectangle (\linewidth,-\textheight);
+      \fill[TrantorDark]
+        (-\Gm@lmargin, \paperheight)
+        rectangle
+        (\dimexpr\paperwidth-\Gm@lmargin\relax, -\paperheight);
+      \node[text=white, anchor=center, inner sep=0pt]
+        at (0.5\linewidth, -0.5\textheight) {%
+        \begin{minipage}{\linewidth}
+          \centering
+          \setcounter{tocdepth}{1}%
+          \colorlet{structure}{white}%
+          \setlength{\parskip}{1.2em}%   spacing between TOC entries
+          \headerfont\Large
+          \tableofcontents
+        \end{minipage}%
+      };
+    \end{tikzpicture}%
+  \end{frame}%
+}
+
+\makeatother

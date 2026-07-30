@@ -1,0 +1,30 @@
+# LaTeX build artefacts
+*.aux
+*.log
+*.nav
+*.snm
+*.out
+*.toc
+*.vrb
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.bbl
+*.blg
+*.auxlock
+
+# tagging sidecar produced by the accessible build
+*-luamml-mathml.html
+
+# keep slides.pdf (it is the showcase); ignore other stray PDFs
+*.pdf
+!slides.pdf
+
+# macOS
+.DS_Store
+
+# scratch generator files and editor temp dirs
+_*.tex
+_*.pdf
+.texpadtmp/
+_*.png

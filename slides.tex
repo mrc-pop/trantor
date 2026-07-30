@@ -1,0 +1,61 @@
+% Draft build (fast). For the accessible, tagged PDF/UA-2 version, comment this
+% line, uncomment the block below it, and run lualatex twice.
+\DocumentMetadata{}
+%\DocumentMetadata{tagging=on, pdfstandard=ua-2, lang=en-GB,
+%  tagging-setup={math/setup={mathml-SE,mathml-AF}, math/alt/use}}
+
+\documentclass{ltx-talk}  % add [handout] to flatten overlays while editing
+\usepackage{trantor}
+\usepackage{euler-math}
+
+% Accent colour (progress bar + the rule under the title).
+\definecolor{accent}{HTML}{2A7AE2}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning, calc, arrows.meta}
+
+\title{The trantor theme}
+\author{Your Name}
+\institute{Your affiliation}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}\sectionpage
+
+\begin{frame}
+\frametitle{A normal slide}
+  Body text is Libertinus Serif; titles are Libertinus Sans; maths uses Euler.
+  \begin{itemize}
+    \item A point with \textbf{bold} and \emph{emphasis}.
+    \item Inline maths sits comfortably in the text: $\sum_i p_i = 1$.
+  \end{itemize}
+\end{frame}
+
+\section{A few details}\sectionpage
+
+% \stitle works like \frametitle but guarantees a gap below the title -- handy
+% on dense slides, where the header's own spacing tends to collapse.
+\begin{frame}
+\stitle{A fuller slide}
+  \begin{itemize}
+      \item \texttt{trantor} is a customisation of the
+         \href{https://ctan.org/pkg/ltx-talk}{\textcolor{accent}{\texttt{ltx-talk}}} class.
+      \item Its look is freely inspired by the
+         \href{https://ctan.org/pkg/beamertheme-metropolis}{\textcolor{accent}{\texttt{metropolis}}} beamer theme.
+      \item Section names on each \texttt{\textbackslash sectionpage} are clickable.
+      \item Swap \texttt{\textbackslash frametitle} for
+         \texttt{\textbackslash stitle} on dense slides to have more
+         room below the title.
+       \item Example display math: \[
+         \langle A_0 B_0 \rangle + \langle A_0 B_1\rangle + 
+         \langle A_1 B_0\rangle - \langle A_1 B_1\rangle \le 2 .
+         \]
+       \item Numerals \& symbols: 0123456789 \yes\ \no.
+  \end{itemize}
+  
+\end{frame}
+
+\end{document}
