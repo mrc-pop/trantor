@@ -1,8 +1,8 @@
 # trantor
 
 A Metropolis-style theme for the [`ltx-talk`](https://ctan.org/pkg/ltx-talk)
-presentation class. Serif body, sans titles, a slim progress bar, and tagged
-PDF/UA output for accessible slides.
+presentation class: Libertinus Serif body, Libertinus Sans titles, a slim
+progress bar, and tagged PDF/UA output for accessible slides.
 
 ![The title slide and an example slide](preview.png)
 
@@ -32,7 +32,7 @@ The second pass fills in the table of contents on the section pages.
 - **Accent colour.** Sets the progress bar and the rule under the title. Define
   it anywhere in your preamble:
   ```latex
-  \definecolor{accent}{HTML}{BF1238}
+  \definecolor{accent}{HTML}{2A7AE2}
   ```
 - **Logo.** Drop a `logo.png` beside your slides and it appears on the title
   page, or redefine `\titlelogo` to point at your own file. With no logo file
