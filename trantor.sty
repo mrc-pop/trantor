@@ -30,6 +30,7 @@
 %      \definecolor{accent}{HTML}{BF1238}
 \providecolor{accent}{HTML}{2A7AE2}
 \colorlet{TrantorDark}{black}
+\colorlet{TrantorMuted}{TrantorDark!60!white}  % subtle grey: affiliation, footline
 \AddToHook{begindocument}{\colorlet{TrantorAccent}{accent}}
 
 % itemize/enumerate labels in black rather than the class default
@@ -61,7 +62,7 @@
 % the slide. Overlaid, so it can go anywhere inside the frame.
 \newcommand{\footline}[1]{%
   \begin{tikzpicture}[remember picture, overlay]
-    \node[anchor=south west, xshift=1ex, yshift=0.7ex, font=\scriptsize]
+    \node[anchor=south west, xshift=1ex, yshift=0.7ex, font=\scriptsize, text=TrantorMuted]
       at (current page.south west) {#1};
   \end{tikzpicture}%
 }
@@ -142,7 +143,7 @@
         {\normalsize \@author\par}%
         \ifx\@institute\empty\else
           \vspace{0.2em}%
-          {\small\color{TrantorDark!60!white} \@institute\par}%
+          {\small\color{TrantorMuted} \@institute\par}%
         \fi
         \vspace{0.2em}%
         {\small \@date\par}%
