@@ -1,19 +1,23 @@
 % trantor.sty -- a Metropolis-style theme for the ltx-talk class.
-% Compile with lualatex. Needs the Libertinus fonts and the euler-math package.
+% LuaLaTeX only. Fonts: Libertinus Serif/Sans (text) + Euler (maths).
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{trantor}[2026-04-28 v1.0 Metropolis-like theme for ltx-talk]
 
-% -- Fonts: Libertinus Serif for the body, Libertinus Sans for titles.
-\RequirePackage{fontspec}
+% LuaTeX only (XeTeX is unsupported and the fonts need a Unicode engine).
+\RequirePackage{iftex}
+\RequireLuaTeX
+\RequirePackage{tikz}
+\RequirePackage{pifont}
+
+% -- Fonts.
+% Text: Libertinus Serif (body) and Libertinus Sans (titles).
 \setsansfont{Libertinus Serif}[Scale=1.05]
 \renewcommand{\familydefault}{\sfdefault}
 \linespread{1.18}
 \newfontfamily\headerfont{Libertinus Sans}
-
-\RequirePackage{tikz}
-\RequirePackage{lastpage}
-\RequirePackage{refcount}
-\RequirePackage{pifont}
+% Maths: Euler (lum-euler, a lua-unicode-math package; needs v0.9+). Change this
+% line for a different maths font, e.g. lum-libertinus.
+\RequirePackage{lum-euler}
 \makeatletter
 
 % Tighten the space around display maths -- the default 11pt reads as a big gap
@@ -30,7 +34,8 @@
 %      \definecolor{accent}{HTML}{BF1238}
 \providecolor{accent}{HTML}{2A7AE2}
 \colorlet{TrantorDark}{black}
-\colorlet{TrantorMuted}{TrantorDark!60!white}  % subtle grey: affiliation, footline
+% Lightest grey that still meets WCAG AA contrast (4.5:1) on white (~4.54:1).
+\definecolor{TrantorMuted}{HTML}{767676}  % affiliation, footline, arxiv
 \AddToHook{begindocument}{\colorlet{TrantorAccent}{accent}}
 
 % itemize/enumerate labels in black rather than the class default
@@ -52,19 +57,25 @@
 
 % Like \frametitle, but forces a gap below the title on packed slides where the
 % header's own spacing collapses. The \par gets us into vertical mode first.
-\newcommand{\stitle}[1]{\frametitle{#1}\par\addvspace{4mm}}
+\NewDocumentCommand\stitle{m}{\frametitle{#1}\par\addvspace{4mm}}
 
 % Tick and cross, for marking things right or wrong.
-\newcommand{\yes}{\ding{51}}
-\newcommand{\no}{\ding{55}}
+\NewDocumentCommand\yes{}{\ding{51}}
+\NewDocumentCommand\no{}{\ding{55}}
 
 % \footline{...}: a small reference or citation pinned to the bottom-left of
 % the slide. Overlaid, so it can go anywhere inside the frame.
-\newcommand{\footline}[1]{%
+\NewDocumentCommand\footline{m}{%
   \begin{tikzpicture}[remember picture, overlay]
     \node[anchor=south west, xshift=1ex, yshift=0.7ex, font=\scriptsize, text=TrantorMuted]
       at (current page.south west) {#1};
   \end{tikzpicture}%
+}
+
+% \arxiv{1306.5001}: a small, grey "arXiv:<id>" tag linked to the abstract.
+% Meant to sit inline next to a statement, e.g. a theorem.
+\NewDocumentCommand\arxiv{m}{%
+  \href{https://arxiv.org/abs/#1}{{\headerfont\scriptsize\color{TrantorMuted}arXiv:#1}}%
 }
 
 % -- Bottom progress bar + frame counter (hidden on plain pages).
@@ -73,6 +84,7 @@
 
 \AddToHook{shipout/foreground}{%
   \iftrantorPlainPage\else
+  \trantorArtifactBegin
   \begin{tikzpicture}[remember picture, overlay]
     \pgfmathsetmacro{\trantorratio}{(\@totalframes > 0) ? (\theframe / \@totalframes) : 0}%
     \fill[TrantorAccent]
@@ -82,6 +94,7 @@
     \node[anchor=south east, inner sep=5pt, font=\tiny, text=TrantorDark]
       at (current page.south east) {\theframe\,/\,\@totalframes};
   \end{tikzpicture}%
+  \trantorArtifactEnd
   \fi
   \global\trantorPlainPagefalse
 }
@@ -99,7 +112,18 @@
 \cs_new_protected:Npn \__trantor_print_section: { \tl_use:N \g__trantor_section_tl }
 \cs_set_eq:NN \trantorSectionTitle \__trantor_print_section:
 
-% Soften the class's dimming of inactive TOC entries (0.2 -> 0.7).
+% Suspend tagging around the theme's decorative / pagination graphics when
+% tagging is on (a no-op otherwise), so the progress bar and frame counter stay
+% out of the structure tree instead of being flagged as loose content.
+\cs_new_protected:Npn \trantorArtifactBegin
+  { \cs_if_exist:NT \tag_suspend:n { \tag_suspend:n { trantor } } }
+\cs_new_protected:Npn \trantorArtifactEnd
+  { \cs_if_exist:NT \tag_resume:n { \tag_resume:n { trantor } } }
+
+% Soften the dimming of inactive TOC entries on the section page (0.2 -> 0.7).
+% ltx-talk exposes no key for this yet, so we override the class-private
+% \__talk_toc_dest:w. Revisit if a supported interface appears or the internal
+% changes.
 \cs_set_protected:Npn \__talk_toc_dest:w #1 . #2 . #3 . #4 . #5 \q_stop #6
   {
     \bool_lazy_or:nnTF

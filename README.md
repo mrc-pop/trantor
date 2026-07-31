@@ -10,9 +10,16 @@ The [demo deck](slides.pdf) is produced by `slides.tex`.
 
 ## Requirements
 
-- LuaLaTeX (the theme uses `fontspec` and Lua-based math tagging).
-- A recent TeX Live or MacTeX, for `ltx-talk`.
-- The Libertinus fonts and the `euler-math` package, both in TeX Live.
+- **LuaLaTeX only.** XeTeX is unsupported by ltx-talk, and the fonts load through
+  fontspec / lua-unicode-math, so trantor requires LuaTeX.
+- A recent TeX Live or MacTeX with the Libertinus fonts and `lua-unicode-math`
+  v0.9+ (for the Euler maths font; `tlmgr update lua-unicode-math`).
+- Tagging is provided by ltx-talk.
+
+trantor sets the fonts: Libertinus Serif (body), Libertinus Sans (titles) and
+Euler (maths). To use a different maths font, change the
+`\RequirePackage{lum-euler}` line in `trantor.sty` (for instance to
+`lum-libertinus`, to match the text).
 
 ## Getting started
 

@@ -5,8 +5,7 @@
 %  tagging-setup={math/setup={mathml-SE,mathml-AF}, math/alt/use}}
 
 \documentclass{ltx-talk}  % add [handout] to flatten overlays while editing
-\usepackage{trantor}
-\usepackage{euler-math}
+\usepackage{trantor}             % sets all fonts: Libertinus text + Euler maths
 
 % Accent colour (progress bar + the rule under the title).
 \definecolor{accent}{HTML}{2A7AE2}
@@ -48,13 +47,13 @@
       \item Section names on each \texttt{\textbackslash sectionpage} are clickable.
       \item Swap \texttt{\textbackslash frametitle} for
          \texttt{\textbackslash stitle} on dense slides to have more
-         room below the title.
+         space below the title.
        \item Example display math: \[
          \langle A_0 B_0 \rangle + \langle A_0 B_1\rangle + 
          \langle A_1 B_0\rangle - \langle A_1 B_1\rangle \le 2 .
          \]
        \item Numerals \& symbols: 0123456789 \yes\ \no.
-       \item Cite a source with \texttt{\textbackslash footline}, shown below.
+       \item Cite with \texttt{\textbackslash footline} (below), or tag a statement with \texttt{\textbackslash arxiv}: \arxiv{1508.05949}.
   \end{itemize}
 
   \footline{(Clauser, Horne, Shimony, Holt, \emph{Phys.~Rev.~Lett.}~1969)}
