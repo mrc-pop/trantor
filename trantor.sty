@@ -1,7 +1,7 @@
 % trantor.sty -- a Metropolis-style theme for the ltx-talk class.
 % LuaLaTeX only. Fonts: Libertinus Serif/Sans (text) + Euler (maths).
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{trantor}[2026-04-28 v1.0 Metropolis-like theme for ltx-talk]
+\ProvidesPackage{trantor}[2026-08-01 v1.0 Metropolis-like theme for ltx-talk]
 
 % LuaTeX only (XeTeX is unsupported and the fonts need a Unicode engine).
 \RequirePackage{iftex}
@@ -14,7 +14,7 @@
 \setsansfont{Libertinus Serif}[Scale=1.05]
 \renewcommand{\familydefault}{\sfdefault}
 \linespread{1.18}
-\newfontfamily\headerfont{Libertinus Sans}
+\newfontfamily\headerfont{Libertinus Sans}[Ligatures=TeX]
 % Maths: Euler (lum-euler, a lua-unicode-math package; needs v0.9+). Change this
 % line for a different maths font, e.g. lum-libertinus.
 \RequirePackage{lum-euler}
@@ -58,6 +58,15 @@
 % Like \frametitle, but forces a gap below the title on packed slides where the
 % header's own spacing collapses. The \par gets us into vertical mode first.
 \NewDocumentCommand\stitle{m}{\frametitle{#1}\par\addvspace{4mm}}
+
+% \standoutline{...}: a centred line of text in the title's sans/size/colour,
+% for emphasis within a normal (light) frame, e.g. closing a slide.
+\NewDocumentCommand\standoutline{m}{%
+  \par
+  \begingroup
+    \centering\headerfont\Large\bfseries\color{TrantorDark}#1\par
+  \endgroup
+}
 
 % Tick and cross, for marking things right or wrong.
 \NewDocumentCommand\yes{}{\ding{51}}
@@ -204,6 +213,31 @@
           \setlength{\parskip}{1.2em}%   spacing between TOC entries
           \headerfont\Large
           \tableofcontents
+        \end{minipage}%
+      };
+    \end{tikzpicture}%
+  \end{frame}%
+}
+
+% \standout{...}: a full frame with the same dark panel as \sectionpage,
+% and the given text centred on it.
+\NewDocumentCommand \standout { +m } {%
+  \global\trantorPlainPagetrue
+  \begin{frame}{}%
+    \thispagestyle{plain}%
+    \noindent
+    \begin{tikzpicture}
+      \useasboundingbox (0,0) rectangle (\linewidth,-\textheight);
+      \fill[TrantorDark]
+        (-\Gm@lmargin, \paperheight)
+        rectangle
+        (\dimexpr\paperwidth-\Gm@lmargin\relax, -\paperheight);
+      \node[text=white, anchor=center, inner sep=0pt]
+        at (0.5\linewidth, -0.5\textheight) {%
+        \begin{minipage}{0.8\linewidth}
+          \centering
+          \headerfont\LARGE\bfseries
+          #1
         \end{minipage}%
       };
     \end{tikzpicture}%
