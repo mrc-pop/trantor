@@ -57,6 +57,15 @@
 \newcommand{\yes}{\ding{51}}
 \newcommand{\no}{\ding{55}}
 
+% \footline{...}: a small reference or citation pinned to the bottom-left of
+% the slide. Overlaid, so it can go anywhere inside the frame.
+\newcommand{\footline}[1]{%
+  \begin{tikzpicture}[remember picture, overlay]
+    \node[anchor=south west, xshift=1ex, yshift=0.7ex, font=\scriptsize]
+      at (current page.south west) {#1};
+  \end{tikzpicture}%
+}
+
 % -- Bottom progress bar + frame counter (hidden on plain pages).
 \newif\iftrantorPlainPage
 \trantorPlainPagefalse

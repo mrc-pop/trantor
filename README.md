@@ -40,6 +40,8 @@ The second pass fills in the table of contents on the section pages.
 - **Title spacing.** Use `\stitle{...}` instead of `\frametitle{...}` on dense
   slides to keep a clear gap below the title.
 - **Tick and cross.** `\yes` and `\no` give a check mark and a cross.
+- **Reference footnote.** `\footline{...}` pins a small citation to the
+  bottom-left of the slide.
 
 ## Building
 
