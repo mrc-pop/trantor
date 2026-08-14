@@ -95,7 +95,11 @@
   \iftrantorPlainPage\else
   \trantorArtifactBegin
   \begin{tikzpicture}[remember picture, overlay]
-    \pgfmathsetmacro{\trantorratio}{(\@totalframes > 0) ? (\theframe / \@totalframes) : 0}%
+    \ifnum\numexpr\@totalframes\relax>0
+      \pgfmathsetmacro{\trantorratio}{\theframe / \@totalframes}%
+    \else
+      \def\trantorratio{0}%
+    \fi
     \fill[TrantorAccent]
       (current page.south west)
       rectangle
