@@ -106,11 +106,16 @@
       at (current page.south west) {#1};
   \end{tikzpicture}%
 }
+% In vertical mode the picture goes in an empty box with the interline glue
+% suppressed on both sides; \prevdepth is put back afterwards, so a paragraph
+% that follows is spaced from the one before as if the box were not there.
+\newdimen\trantor@footlinedepth
 \NewDocumentCommand\footline{m}{%
   \ifvmode
+    \trantor@footlinedepth=\prevdepth
     \nointerlineskip
     \vbox to 0pt{\vss\hbox to 0pt{\trantor@footlinepic{#1}\hss}}%
-    \nointerlineskip
+    \prevdepth=\trantor@footlinedepth
   \else
     \trantor@footlinepic{#1}%
   \fi
