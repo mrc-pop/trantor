@@ -356,6 +356,26 @@
       }
   }
 
+% Run #1 inside the current frame if there is one, else in a fresh frame. Mirrors
+% the class's \maketitle, so a document can wrap the title page, a divider or a
+% panel in its own frame and put a \note or a \footline alongside -- the beamer
+% idiom. Called between frames, they open their own as before. The {} is the
+% title argument under frame-title-arg; without it the frame takes the first
+% token of #1 as its title, and a \plainpage there is lost.
+\cs_new_protected:Npn \trantor@inframe #1
+  {
+    \bool_if:NTF \l__talk_frame_bool
+      {#1}
+      { \begin{frame}{} #1 \end{frame} }
+  }
+% The same, with the frame's optional argument.
+\cs_new_protected:Npn \trantor@inframe@opt #1 #2
+  {
+    \bool_if:NTF \l__talk_frame_bool
+      {#2}
+      { \begin{frame}[#1]{} #2 \end{frame} }
+  }
+
 % Set while typesetting an \outlinepage, where no entry is the "current" one and
 % everything is printed at full opacity.
 \bool_new:N \g__trantor_outline_bool
@@ -404,9 +424,8 @@
 % plain \vfill here with nothing to stretch against. The \vspace at the end is
 % then the margin below the block rather than a nudge off centre.
 \renewcommand{\maketitle}{%
-  \global\trantorPlainPagetrue
-  \begin{frame}[vertical-alignment = bottom]{}%
-    \thispagestyle{plain}%
+  \trantor@inframe@opt{vertical-alignment = bottom}{%
+    \plainpage
     \hspace*{0.04\paperwidth}%
     \begin{minipage}{0.82\paperwidth}
       \raggedright
@@ -444,15 +463,14 @@
     \end{minipage}%
     \hspace*{0.04\paperwidth}%
     \vspace{0.12\paperheight}%
-  \end{frame}%
+  }%
 }
 
 % -- The dark, full-bleed panel behind \sectionpage, \outlinepage and \standout:
 % a plain frame flooded with TrantorDark, with #1 centred on it.
 \NewDocumentCommand \trantorDarkFrame { +m } {%
-  \global\trantorPlainPagetrue
-  \begin{frame}{}%
-    \thispagestyle{plain}%
+  \trantor@inframe{%
+    \plainpage
     \noindent
     \begin{tikzpicture}[overlay=false, remember picture=false]
       \useasboundingbox (0,0) rectangle (\linewidth,-\textheight);
@@ -463,7 +481,7 @@
       \node[text=TrantorLight, anchor=center, inner sep=0pt]
         at (0.5\linewidth, -0.5\textheight) {#1};
     \end{tikzpicture}%
-  \end{frame}%
+  }%
 }
 
 % The mini-TOC as it appears on those panels.
@@ -482,7 +500,7 @@
 % bar, on the ordinary light background. Deliberately not a plain page -- it
 % carries a number and the footer bar, so it reads as part of the talk.
 \NewDocumentCommand \trantor@divider { +m } {%
-  \begin{frame}{}%
+  \trantor@inframe{%
     \thispagestyle{plain}%
     \centering
     \begin{minipage}{0.52\linewidth}%
@@ -493,7 +511,7 @@
       #1%
     \end{minipage}%
     \par
-  \end{frame}%
+  }%
 }
 
 % -- Section divider page. By default the mini-TOC with the current section
