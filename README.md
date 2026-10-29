@@ -55,6 +55,9 @@ preamble. The others can be changed at any point.
   in `trantor.sty` for another.
 - **Title spacing**: use `\stitle{...}` instead of `\frametitle{...}` on dense
   slides to keep a clear gap below the title.
+- **Inside your own frame**: `\maketitle`, the divider commands and `\standout`
+  typeset in the current frame if there is one, so a `\note` or a `\footline` can
+  sit alongside them; called between frames they open their own.
 - **Divider slides**: `\sectionpage` and `\subsectionpage` follow the `divider`
   option; `\outlinepage` puts the table of contents on a dark slide with every
   entry in full white, for an overview after the title page or between parts of
@@ -65,6 +68,8 @@ preamble. The others can be changed at any point.
 - **Reference footnote**: `\footline{...}` pins a small citation to the
   bottom-left of the slide, and `\arxiv{1508.05949}` tags a statement with a
   small grey link to the abstract.
+- **Plain slides**: `\plainpage` hides the progress bar and frame number on a
+  frame, as the title page and the dark panels do. Useful for a full-bleed image.
 - **Backup slides**: `\appendix` starts them, and the `appendix` option decides
   how they are numbered.
 - **Colours**: `TrantorAccent` is the one meant to change; `TrantorDark`,
