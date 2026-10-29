@@ -37,6 +37,7 @@ Give them to the package, or to `\trantorset`, which also works mid-document:
 | `accent = blue!60!black` | accent colour from any xcolor expression |
 | `numbering = content` | *(default)* the title and divider slides are not numbered, only the "actual content" is |
 | `numbering = all` | every slide is numbered |
+| `numbering = none` | no frame number at all; the progress bar stays |
 | `divider = toc` | *(default)* `\sectionpage` is a dark slide with the table of contents and the current section highlighted |
 | `divider = title` | `\sectionpage` names only the current section, over a progress bar |
 | `header = light` | *(default)* frame titles on the page background |

@@ -49,6 +49,8 @@
 \newif\iftrantor@restart      \trantor@restartfalse
 % Set by \appendix itself, so the counter knows which side of it a slide is on.
 \newif\iftrantor@inappendix   \trantor@inappendixfalse
+% Cleared by "numbering = none": the progress bar stays, the k/n beside it goes.
+\newif\iftrantor@shownumber    \trantor@shownumbertrue
 
 % -- Header bar carrying the frame title (hidden on plain pages).
 \AddToHook{begindocument}{%
@@ -211,8 +213,10 @@
       (current page.south west)
       rectangle
       ([xshift=\trantorratio\paperwidth, yshift=1pt] current page.south west);
-    \node[anchor=south east, inner sep=5pt, font=\tiny, text=TrantorDark]
-      at (current page.south east) {\the\trantor@n\,/\,\the\trantor@d};
+    \iftrantor@shownumber
+      \node[anchor=south east, inner sep=5pt, font=\tiny, text=TrantorDark]
+        at (current page.south east) {\the\trantor@n\,/\,\the\trantor@d};
+    \fi
   \end{tikzpicture}%
   \trantorArtifactEnd
   \fi
@@ -266,6 +270,7 @@
 %                                number, so it reads "content slide k of n"
 %   numbering   = all            count every slide, so the number tracks the
 %                                PDF page
+%   numbering   = none           no frame number; the progress bar stays
 %   divider     = toc            (default) \sectionpage is the dark panel with
 %                                the mini-TOC, current section picked out
 %   divider     = title          \sectionpage names only the current section,
@@ -289,8 +294,12 @@
     accent      .code:n = \colorlet{TrantorAccent}{#1} ,
     accent-html .code:n = \definecolor{TrantorAccent}{HTML}{#1} ,
     numbering .choice: ,
-    numbering / content .code:n = \bool_gset_true:N  \g__trantor_uncount_bool ,
-    numbering / all     .code:n = \bool_gset_false:N \g__trantor_uncount_bool ,
+    numbering / content .code:n =
+      { \bool_gset_true:N  \g__trantor_uncount_bool \global\trantor@shownumbertrue } ,
+    numbering / all     .code:n =
+      { \bool_gset_false:N \g__trantor_uncount_bool \global\trantor@shownumbertrue } ,
+    numbering / none    .code:n =
+      { \bool_gset_true:N  \g__trantor_uncount_bool \global\trantor@shownumberfalse } ,
     divider .choice: ,
     divider / toc   .code:n = \global\trantor@titledividerfalse ,
     divider / title .code:n = \global\trantor@titledividertrue ,
