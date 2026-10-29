@@ -49,6 +49,7 @@
 \newif\iftrantor@restart      \trantor@restartfalse
 % Set by \appendix itself, so the counter knows which side of it a slide is on.
 \newif\iftrantor@inappendix   \trantor@inappendixfalse
+\newif\iftrantor@bareuntitled \trantor@bareuntitledfalse
 
 % -- Header bar carrying the frame title (hidden on plain pages).
 \AddToHook{begindocument}{%
@@ -80,6 +81,39 @@
   \EditInstance{footer}{std}{element-order = {}}%
   \EditInstance{frametitle}{header}{after-vspace = 6mm minus 3mm}%
 }
+
+% -- Under "untitled = bare", a frame with no \frametitle gets no header band.
+% The class draws it regardless, which under "header = dark" leaves an empty
+% dark slab across the top of a full-bleed image slide; metropolis left such
+% frames bare, and decks ported from it expect that.
+%
+% The band is drawn from \@oddhead, so this replaces \ps@talk, and \pagestyle
+% has to be re-issued for the new definition to take. Read at shipout, so the
+% key can be switched mid-talk.
+\ExplSyntaxOn
+\cs_new_protected:Npn \trantor@header
+  {
+    \iftrantor@bareuntitled
+      % Guard the class internal: a class change should not make this an error.
+      \cs_if_exist:NTF \g__talk_frame_title_tl
+        {
+          \tl_if_empty:NF \g__talk_frame_title_tl
+            { \UseInstance { header } { std } }
+        }
+        { \UseInstance { header } { std } }
+    \else
+      \UseInstance { header } { std }
+    \fi
+  }
+\cs_set_nopar:Npn \ps@talk
+  {
+    \cs_set_nopar:Npn \@oddhead { \trantor@header \hfil }
+    \cs_set_nopar:Npn \@oddfoot { \UseInstance { footer } { std } }
+    \cs_set_eq:NN \@evenhead \@oddhead
+    \cs_set_eq:NN \@evenfoot \@oddfoot
+  }
+\ExplSyntaxOff
+\pagestyle{talk}
 
 % Like \frametitle, but forces a gap below the title on packed slides where the
 % header's own spacing collapses. The \par gets us into vertical mode first.
@@ -272,6 +306,9 @@
 %                                over a progress bar on the light background
 %   header      = light          (default) frame titles on the page background
 %   header      = dark           frame titles in a dark band
+%   untitled    = band           (default) frames with no \frametitle still
+%                                carry the (empty) header band
+%   untitled    = bare           frames with no \frametitle get no band
 %   appendix    = overrun        (default) backup slides keep counting past the
 %                                total, 16/15, 17/15, with the bar pinned full
 %   appendix    = restart        backup slides are numbered among themselves,
@@ -297,12 +334,21 @@
     header .choice: ,
     header / light .code:n = \global\trantor@darkheaderfalse ,
     header / dark  .code:n = \global\trantor@darkheadertrue ,
+    untitled .choice: ,
+    untitled / band .code:n = \global\trantor@bareuntitledfalse ,
+    untitled / bare .code:n = \global\trantor@bareuntitledtrue ,
     appendix .choice: ,
     appendix / overrun .code:n = \global\trantor@restartfalse ,
     appendix / restart .code:n = \global\trantor@restarttrue ,
   }
 \keys_set:nn { trantor }
-  { numbering = content, divider = toc, header = light, appendix = overrun }
+  {
+    numbering = content,
+    divider = toc,
+    header = light,
+    untitled = band,
+    appendix = overrun,
+  }
 
 \NewDocumentCommand \trantorset { m } { \keys_set:nn { trantor } {#1} }
 
