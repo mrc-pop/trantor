@@ -41,6 +41,8 @@ Give them to the package, or to `\trantorset`, which also works mid-document:
 | `divider = title` | `\sectionpage` names only the current section, over a progress bar |
 | `header = light` | *(default)* frame titles on the page background |
 | `header = dark` | frame titles inside a dark band |
+| `logo = fixed` | *(default)* `\titlelogo` at a fixed 1.4cm height |
+| `logo = fill` | `\titlelogo` fills its column, height capped at `0.32\paperheight`, aspect ratio kept |
 | `appendix = overrun` | *(default)* backup slides count past the total, e.g. 16/15, 17/15 |
 | `appendix = restart` | backup slides are numbered among themselves, e.g. 1/3, 2/3 |
 

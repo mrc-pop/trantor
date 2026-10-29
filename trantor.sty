@@ -49,6 +49,7 @@
 \newif\iftrantor@restart      \trantor@restartfalse
 % Set by \appendix itself, so the counter knows which side of it a slide is on.
 \newif\iftrantor@inappendix   \trantor@inappendixfalse
+\newif\iftrantor@filllogo      \trantor@filllogofalse
 
 % -- Header bar carrying the frame title (hidden on plain pages).
 \AddToHook{begindocument}{%
@@ -272,6 +273,9 @@
 %                                over a progress bar on the light background
 %   header      = light          (default) frame titles on the page background
 %   header      = dark           frame titles in a dark band
+%   logo        = fixed          (default) \titlelogo at a fixed 1.4cm height
+%   logo        = fill           \titlelogo fills its column, height capped at
+%                                0.32\paperheight, aspect ratio kept
 %   appendix    = overrun        (default) backup slides keep counting past the
 %                                total, 16/15, 17/15, with the bar pinned full
 %   appendix    = restart        backup slides are numbered among themselves,
@@ -297,12 +301,18 @@
     header .choice: ,
     header / light .code:n = \global\trantor@darkheaderfalse ,
     header / dark  .code:n = \global\trantor@darkheadertrue ,
+    logo .choice: ,
+    logo / fixed .code:n = \global\trantor@filllogofalse ,
+    logo / fill  .code:n = \global\trantor@filllogotrue ,
     appendix .choice: ,
     appendix / overrun .code:n = \global\trantor@restartfalse ,
     appendix / restart .code:n = \global\trantor@restarttrue ,
   }
 \keys_set:nn { trantor }
-  { numbering = content, divider = toc, header = light, appendix = overrun }
+  {
+    numbering = content, divider = toc, header = light, logo = fixed,
+    appendix = overrun
+  }
 
 \NewDocumentCommand \trantorset { m } { \keys_set:nn { trantor } {#1} }
 
@@ -395,9 +405,18 @@
 \ProcessKeyOptions[trantor]
 
 % -- Title page. Drop a logo.png next to your slides, or redefine \titlelogo.
+% Under "logo = fill" the logo takes the width of the column it sits in rather
+% than a fixed height, capped so a tall one cannot overrun the title block. A
+% wide one -- a wordmark, say -- runs out of its column and off the page at a
+% fixed height, since the width follows from the height and the aspect ratio.
 \newcommand{\titlelogo}{%
   \IfFileExists{logo.png}
-    {\includegraphics[height=1.4cm, alt={Organisation logo}]{logo.png}}{}%
+    {\iftrantor@filllogo
+       \includegraphics[width=\linewidth, height=0.32\paperheight,
+         keepaspectratio, alt={Organisation logo}]{logo.png}%
+     \else
+       \includegraphics[height=1.4cm, alt={Organisation logo}]{logo.png}%
+     \fi}{}%
 }
 
 % Bottom-aligned: ltx-talk centres frame content by default, which leaves a
