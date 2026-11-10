@@ -142,10 +142,20 @@
 
 % \immediate, so the value written is the counter here and not at the next
 % shipout, which would already include the first backup slide.
-\NewDocumentCommand\appendix{}{%
+\newcommand\trantor@appendix{%
   \global\trantor@inappendixtrue
   \immediate\write\@auxout{\string\trantor@setcontentframes{\trantorFrameNumber}}%
 }
+% ltx-talk 0.6 has an \appendix of its own, which marks the frames that follow
+% and the table of contents; defining ours as well stops the document with
+% "Command '\appendix' already defined". So the theme's part runs in a hook
+% before the class's command where there is one, and stands alone where there is
+% not, as on ltx-talk 0.5.
+\ifdefined\appendix
+  \AddToHook{cmd/appendix/before}{\trantor@appendix}
+\else
+  \NewDocumentCommand\appendix{}{\trantor@appendix}
+\fi
 
 % Numerator and denominator of the frame counter. Count registers rather than
 % macros: pgfmath expands while parsing, so a macro carrying a conditional loops.
