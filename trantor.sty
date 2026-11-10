@@ -9,15 +9,6 @@
 \RequirePackage{tikz}
 \RequirePackage{pifont}
 
-% -- Fonts.
-% Text: Libertinus Serif (body) and Libertinus Sans (titles).
-\setsansfont{Libertinus Serif}[Scale=1.05]
-\renewcommand{\familydefault}{\sfdefault}
-\linespread{1.18}
-\newfontfamily\headerfont{Libertinus Sans}[Ligatures=TeX]
-% Maths: Euler (lum-euler, a lua-unicode-math package; needs v0.9+). Change this
-% line for a different maths font, e.g. lum-libertinus.
-\RequirePackage{lum-euler}
 \makeatletter
 
 % Tighten the space around display maths -- the default 11pt reads as a big gap
@@ -49,6 +40,7 @@
 \newif\iftrantor@restart      \trantor@restartfalse
 % Set by \appendix itself, so the counter knows which side of it a slide is on.
 \newif\iftrantor@inappendix   \trantor@inappendixfalse
+\newif\iftrantor@documentfonts \trantor@documentfontsfalse
 
 % -- Header bar carrying the frame title (hidden on plain pages).
 \AddToHook{begindocument}{%
@@ -272,6 +264,9 @@
 %                                over a progress bar on the light background
 %   header      = light          (default) frame titles on the page background
 %   header      = dark           frame titles in a dark band
+%   fonts       = theme          (default) Libertinus Serif and Sans, Euler maths
+%   fonts       = document       the theme sets no faces; the document loads its
+%                                own with fontspec and its own maths font
 %   appendix    = overrun        (default) backup slides keep counting past the
 %                                total, 16/15, 17/15, with the bar pinned full
 %   appendix    = restart        backup slides are numbered among themselves,
@@ -282,6 +277,7 @@
 %
 % divider and header are read when a slide is typeset and at \begin{document}
 % respectively, so set header in the preamble; divider may be switched mid-talk.
+% fonts is read as the package loads, so it works only as a package option.
 \bool_new:N \g__trantor_uncount_bool
 
 \keys_define:nn { trantor }
@@ -297,12 +293,21 @@
     header .choice: ,
     header / light .code:n = \global\trantor@darkheaderfalse ,
     header / dark  .code:n = \global\trantor@darkheadertrue ,
+    fonts .choice: ,
+    fonts / theme    .code:n = \global\trantor@documentfontsfalse ,
+    fonts / document .code:n = \global\trantor@documentfontstrue ,
     appendix .choice: ,
     appendix / overrun .code:n = \global\trantor@restartfalse ,
     appendix / restart .code:n = \global\trantor@restarttrue ,
   }
 \keys_set:nn { trantor }
-  { numbering = content, divider = toc, header = light, appendix = overrun }
+  {
+    numbering = content,
+    divider = toc,
+    header = light,
+    fonts = theme,
+    appendix = overrun,
+  }
 
 \NewDocumentCommand \trantorset { m } { \keys_set:nn { trantor } {#1} }
 
@@ -393,6 +398,22 @@
 % Processed after the defaults set above, so an option overrides them, and
 % \trantorset still works afterwards for anything you want to change mid-talk.
 \ProcessKeyOptions[trantor]
+
+% -- Fonts. Sans as the body family at a slightly open leading either way; the
+% faces themselves only under "fonts = theme".
+\renewcommand{\familydefault}{\sfdefault}
+\linespread{1.18}
+\iftrantor@documentfonts
+  % The document sets its own faces and maths font; the titles take its sans.
+  \providecommand\headerfont{\sffamily}
+\else
+  % Text: Libertinus Serif (body) and Libertinus Sans (titles).
+  \setsansfont{Libertinus Serif}[Scale=1.05]
+  \newfontfamily\headerfont{Libertinus Sans}[Ligatures=TeX]
+  % Maths: Euler (lum-euler, a lua-unicode-math package; needs v0.9+). Change
+  % this line for a different maths font, e.g. lum-libertinus.
+  \RequirePackage{lum-euler}
+\fi
 
 % -- Title page. Drop a logo.png next to your slides, or redefine \titlelogo.
 \newcommand{\titlelogo}{%
