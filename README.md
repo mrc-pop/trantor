@@ -41,11 +41,14 @@ Give them to the package, or to `\trantorset`, which also works mid-document:
 | `divider = title` | `\sectionpage` names only the current section, over a progress bar |
 | `header = light` | *(default)* frame titles on the page background |
 | `header = dark` | frame titles inside a dark band |
+| `fonts = theme` | *(default)* Libertinus Serif and Sans, Euler maths |
+| `fonts = document` | the theme sets no faces; the document loads its own with fontspec, and its own maths font |
 | `appendix = overrun` | *(default)* backup slides count past the total, e.g. 16/15, 17/15 |
 | `appendix = restart` | backup slides are numbered among themselves, e.g. 1/3, 2/3 |
 
-`header` is read once at `\begin{document}`, so it should be set in the
-preamble. The others can be changed at any point.
+`header` is read once at `\begin{document}` and `fonts` as the package loads, so
+set those in the preamble; `fonts` works only as a package option. The others can
+be changed at any point.
 
 ## Customising
 
