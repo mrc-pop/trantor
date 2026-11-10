@@ -42,6 +42,11 @@
 % itemize/enumerate labels in the body colour rather than the class default
 \AddToHook{begindocument}{\colorlet{structure}{TrantorDark}}
 
+% Under "quotes = italic", quote and quotation are set in italic, as beamer did;
+% decks ported from it are written expecting that.
+\AddToHook{env/quote/begin}{\iftrantor@italicquotes\itshape\fi}
+\AddToHook{env/quotation/begin}{\iftrantor@italicquotes\itshape\fi}
+
 % State for the two look options; see the \trantorset block below. Plain \newif
 % rather than expl3 bools, so the \AddToHook bodies here can read them directly.
 \newif\iftrantor@darkheader   \trantor@darkheaderfalse
@@ -49,6 +54,7 @@
 \newif\iftrantor@restart      \trantor@restartfalse
 % Set by \appendix itself, so the counter knows which side of it a slide is on.
 \newif\iftrantor@inappendix   \trantor@inappendixfalse
+\newif\iftrantor@italicquotes \trantor@italicquotesfalse
 
 % -- Header bar carrying the frame title (hidden on plain pages).
 \AddToHook{begindocument}{%
@@ -272,6 +278,8 @@
 %                                over a progress bar on the light background
 %   header      = light          (default) frame titles on the page background
 %   header      = dark           frame titles in a dark band
+%   quotes      = upright        (default) quote and quotation in the body face
+%   quotes      = italic         quote and quotation in italic, as under beamer
 %   appendix    = overrun        (default) backup slides keep counting past the
 %                                total, 16/15, 17/15, with the bar pinned full
 %   appendix    = restart        backup slides are numbered among themselves,
@@ -297,12 +305,21 @@
     header .choice: ,
     header / light .code:n = \global\trantor@darkheaderfalse ,
     header / dark  .code:n = \global\trantor@darkheadertrue ,
+    quotes .choice: ,
+    quotes / upright .code:n = \global\trantor@italicquotesfalse ,
+    quotes / italic  .code:n = \global\trantor@italicquotestrue ,
     appendix .choice: ,
     appendix / overrun .code:n = \global\trantor@restartfalse ,
     appendix / restart .code:n = \global\trantor@restarttrue ,
   }
 \keys_set:nn { trantor }
-  { numbering = content, divider = toc, header = light, appendix = overrun }
+  {
+    numbering = content,
+    divider = toc,
+    header = light,
+    quotes = upright,
+    appendix = overrun,
+  }
 
 \NewDocumentCommand \trantorset { m } { \keys_set:nn { trantor } {#1} }
 
