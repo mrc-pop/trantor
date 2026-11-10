@@ -262,6 +262,8 @@
 %
 %   accent-html = BF1238         accent colour from a hex string
 %   accent      = blue!60!black  accent colour from any xcolor expression
+%   alert       = TrantorAccent  colour of \alert, from any xcolor expression;
+%                                the class's red unless set
 %   numbering   = content        (default) title and divider slides consume no
 %                                number, so it reads "content slide k of n"
 %   numbering   = all            count every slide, so the number tracks the
@@ -288,6 +290,7 @@
   {
     accent      .code:n = \colorlet{TrantorAccent}{#1} ,
     accent-html .code:n = \definecolor{TrantorAccent}{HTML}{#1} ,
+    alert       .code:n = \colorlet{alert}{#1} ,
     numbering .choice: ,
     numbering / content .code:n = \bool_gset_true:N  \g__trantor_uncount_bool ,
     numbering / all     .code:n = \bool_gset_false:N \g__trantor_uncount_bool ,
