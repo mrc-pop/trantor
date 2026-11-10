@@ -109,12 +109,17 @@
 % In vertical mode the picture goes in an empty box with the interline glue
 % suppressed on both sides; \prevdepth is put back afterwards, so a paragraph
 % that follows is spaced from the one before as if the box were not there.
+% No paragraph is started, so the box opens a P of its own; otherwise its text
+% is tagged directly under the frame, which PDF/UA-2 forbids (veraPDF: "<Sect>
+% shall not contain content items").
 \newdimen\trantor@footlinedepth
 \NewDocumentCommand\footline{m}{%
   \ifvmode
     \trantor@footlinedepth=\prevdepth
     \nointerlineskip
+    \tagstructbegin{tag=P}%
     \vbox to 0pt{\vss\hbox to 0pt{\trantor@footlinepic{#1}\hss}}%
+    \tagstructend
     \prevdepth=\trantor@footlinedepth
   \else
     \trantor@footlinepic{#1}%
